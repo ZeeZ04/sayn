@@ -1,0 +1,43 @@
+import asyncio, sys, subprocess, time
+from playwright.async_api import async_playwright
+OUT = sys.argv[1]
+srv = subprocess.Popen([sys.executable, '-m', 'http.server', '8765', '-d', 'www'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+time.sleep(1)
+async def main():
+    async with async_playwright() as p:
+        b = await p.chromium.launch(args=['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'])
+        errs = []
+        ctx = await b.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=2, permissions=['camera', 'microphone'])
+        pg = await ctx.new_page()
+        pg.on('pageerror', lambda e: errs.append('pageerror: ' + str(e)))
+        pg.on('console', lambda m: m.type == 'error' and errs.append('console: ' + m.text))
+        await pg.goto('http://localhost:8765/'); await pg.wait_for_timeout(2100)
+        await pg.screenshot(path=f'{OUT}/1-splash.png')
+        await pg.wait_for_timeout(1000)
+        await pg.screenshot(path=f'{OUT}/2-onboard.png')
+        await pg.click('#obSkip'); await pg.wait_for_timeout(400)
+        # simulate captions + typed text
+        await pg.evaluate("""() => { document.querySelector('#typeIn').value='Can you repeat that please?'; document.querySelector('#typeForm').requestSubmit(); }""")
+        await pg.wait_for_timeout(500)
+        await pg.screenshot(path=f'{OUT}/3-talk.png')
+        await pg.click('#camToggle'); await pg.wait_for_timeout(2500)
+        await pg.screenshot(path=f'{OUT}/4-talk-cam.png')
+        await pg.click('[data-view=glasses]'); await pg.wait_for_timeout(600)
+        await pg.screenshot(path=f'{OUT}/5-glasses.png')
+        await pg.click('#tabs [data-tab=signs]'); await pg.wait_for_timeout(600)
+        await pg.screenshot(path=f'{OUT}/6-signs.png')
+        await pg.click('#tabs [data-tab=history]'); await pg.wait_for_timeout(400)
+        await pg.screenshot(path=f'{OUT}/7-history.png')
+        await pg.click('#tabs [data-tab=settings]'); await pg.wait_for_timeout(400)
+        await pg.screenshot(path=f'{OUT}/8-settings.png')
+        await pg.emulate_media(color_scheme='light'); await pg.click('#tabs [data-tab=talk]'); await pg.click('[data-view=phone]'); await pg.wait_for_timeout(500)
+        await pg.screenshot(path=f'{OUT}/9-talk-light.png')
+        d = await b.new_page(viewport={'width': 1366, 'height': 860})
+        d.on('pageerror', lambda e: errs.append('desk pageerror: ' + str(e)))
+        await d.goto('http://localhost:8765/#talk'); await d.wait_for_timeout(3200)
+        if await d.is_visible('#obSkip'): await d.click('#obSkip')
+        await d.wait_for_timeout(300); await d.screenshot(path=f'{OUT}/10-desktop.png')
+        print('ERRORS:', errs[:10] if errs else 'none')
+        await b.close()
+try: asyncio.run(main())
+finally: srv.terminate()

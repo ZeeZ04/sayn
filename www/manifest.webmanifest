@@ -1,0 +1,22 @@
+{
+  "name": "Sayn",
+  "short_name": "Sayn",
+  "description": "Live subtitles for what people say, and text and voice for what you sign.",
+  "id": "./",
+  "start_url": "./#talk",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B0E13",
+  "theme_color": "#0B0E13",
+  "categories": ["accessibility", "productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Talk", "url": "./#talk" },
+    { "name": "Teach signs", "url": "./#signs" }
+  ]
+}

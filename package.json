@@ -1,0 +1,23 @@
+{
+  "name": "sayn",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Live subtitles for what people say, and text and voice for what you sign.",
+  "scripts": {
+    "serve": "npx --yes http-server www -p 8080 -c-1",
+    "icons": "python3 scripts/make-icons.py www/icons",
+    "android": "npx cap add android && node scripts/native-permissions.mjs && npx cap sync android && npx cap open android",
+    "ios": "npx cap add ios --packagemanager SPM && node scripts/native-permissions.mjs && node scripts/ios-speech.mjs && npx cap sync ios && npx cap open ios",
+    "sync": "npx cap sync && node scripts/native-permissions.mjs"
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  }
+}

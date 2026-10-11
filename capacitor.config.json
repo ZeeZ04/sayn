@@ -1,0 +1,8 @@
+{
+  "appId": "app.sayn.mobile",
+  "appName": "Sayn",
+  "webDir": "www",
+  "backgroundColor": "#0B0E13",
+  "android": { "allowMixedContent": false },
+  "ios": { "contentInset": "never", "includePlugins": [] }
+}
